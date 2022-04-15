@@ -26,18 +26,16 @@ const (
 )
 
 func main() {
-	contents, err := os.ReadFile(configFilename)
+	configContents, err := os.ReadFile(configFilename)
 	if err != nil {
 		log.Fatalf("failed to open %s: %v", configFilename, err)
 	}
 
 	config := Config{}
-	err = json.Unmarshal(contents, &config)
+	err = json.Unmarshal(configContents, &config)
 	if err != nil {
 		log.Fatalf("failed to unmarshal config file: %v", err)
 	}
-
-	r := chi.NewRouter()
 
 	db, err := sql.Open("postgres", fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s",
@@ -51,6 +49,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to ping database: %v", err)
 	}
+
+	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
 
