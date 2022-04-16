@@ -1,6 +1,7 @@
 package main
 
 import (
+	"account-service/account"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -54,12 +55,9 @@ func main() {
 
 	r.Use(middleware.Logger)
 
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		_, err := w.Write([]byte("Hello world"))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-	})
+	r.Get("/api/v1/accounts/{id}", account.GetByIdHandler)
+	r.Get("/api/v1/accounts", account.GetByEmailHandler)
+	r.Post("/api/v1/accounts", account.PostHandler)
 
 	log.Println("listening on http://localhost" + port)
 	err = http.ListenAndServe(port, r)
