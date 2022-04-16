@@ -1,2 +1,1 @@
-# E-commerce Microservices
-
+# E-commerce REST API
