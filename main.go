@@ -55,9 +55,12 @@ func main() {
 
 	r.Use(middleware.Logger)
 
+	// Account service handlers
 	r.Get("/api/v1/accounts/{id}", account.GetByIdHandler)
-	r.Get("/api/v1/accounts", account.GetByEmailHandler)
+	r.Get("/api/v1/accounts", account.GetHandler)
 	r.Post("/api/v1/accounts", account.PostHandler)
+	r.Put("/api/v1/accounts/{id}", account.UpdateByIdHandler)
+	r.Delete("/api/v1/accounts/{id}", account.DeleteAccountByIdHandler)
 
 	log.Println("listening on http://localhost" + port)
 	err = http.ListenAndServe(port, r)

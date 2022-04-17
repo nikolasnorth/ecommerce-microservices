@@ -17,7 +17,3 @@ type Account struct {
 func (a *Account) FromJson(r io.Reader) error {
 	return json.NewDecoder(r).Decode(a)
 }
-
-func (a *Account) SendJson(w io.Writer) error {
-	return json.NewEncoder(w).Encode(a)
-}
