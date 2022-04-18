@@ -2,6 +2,7 @@ package main
 
 import (
 	"account-service/account"
+	"account-service/db"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -32,27 +33,26 @@ func main() {
 		log.Fatalf("failed to open %s: %v", configFilename, err)
 	}
 
-	config := Config{}
+	config := db.Config{}
 	err = json.Unmarshal(configContents, &config)
 	if err != nil {
 		log.Fatalf("failed to unmarshal config file: %v", err)
 	}
 
-	db, err := sql.Open("postgres", fmt.Sprintf(
+	db.Conn, err = sql.Open("postgres", fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s",
-		config.DbHost, config.DbPort, config.DbUser, config.DbPassword, config.DbName,
+		config.Host, config.Port, config.User, config.Password, config.Name,
 	))
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	err = db.Ping()
+	err = db.Conn.Ping()
 	if err != nil {
 		log.Fatalf("failed to ping database: %v", err)
 	}
 
 	r := chi.NewRouter()
-
 	r.Use(middleware.Logger)
 
 	// Account service handlers
