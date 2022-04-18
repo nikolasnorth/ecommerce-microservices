@@ -14,14 +14,6 @@ import (
 	"os"
 )
 
-type Config struct {
-	DbHost     string `json:"dbHost"`
-	DbPort     int    `json:"dbPort"`
-	DbUser     string `json:"dbUser"`
-	DbPassword string `json:"dbPassword"`
-	DbName     string `json:"dbName"`
-}
-
 const (
 	configFilename = "config.json"
 	port           = ":8000"
