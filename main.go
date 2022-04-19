@@ -3,12 +3,11 @@ package main
 import (
 	"account-service/account"
 	"account-service/db"
-	"database/sql"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
@@ -31,17 +30,15 @@ func main() {
 		log.Fatalf("failed to unmarshal config file: %v", err)
 	}
 
-	db.Conn, err = sql.Open("postgres", fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s",
-		config.Host, config.Port, config.User, config.Password, config.Name,
-	))
+	err = db.InitDb(config)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatalf("could not open database connection: %v", err)
 	}
 
-	err = db.Conn.Ping()
-	if err != nil {
-		log.Fatalf("failed to ping database: %v", err)
+	dbSeed := flag.Bool("seed", false, "run the seed script to populate the database")
+	if *dbSeed {
+		// Seed database
+		fmt.Println("seeding database...")
 	}
 
 	r := chi.NewRouter()
