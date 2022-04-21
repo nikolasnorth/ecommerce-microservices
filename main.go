@@ -4,13 +4,13 @@ import (
 	"account-service/account"
 	"account-service/db"
 	"encoding/json"
-	"flag"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 )
 
 const (
@@ -35,10 +35,9 @@ func main() {
 		log.Fatalf("could not open database connection: %v", err)
 	}
 
-	dbSeed := flag.Bool("seed", false, "run the seed script to populate the database")
-	if *dbSeed {
-		// Seed database
-		fmt.Println("seeding database...")
+	err = db.SeedDb()
+	if err != nil {
+		log.Fatalf("could not seed database: %v", err)
 	}
 
 	r := chi.NewRouter()
@@ -51,9 +50,26 @@ func main() {
 	r.Put("/api/v1/accounts/{id}", account.UpdateByIdHandler)
 	r.Delete("/api/v1/accounts/{id}", account.DeleteAccountByIdHandler)
 
+	go func() {
+		err = http.ListenAndServe(port, r)
+		if err != nil {
+			log.Fatalf("failed to start server: %v", err)
+		}
+	}()
 	log.Println("listening on http://localhost" + port)
-	err = http.ListenAndServe(port, r)
+
+	sigChan := make(chan os.Signal)
+	signal.Notify(sigChan, os.Interrupt)
+	signal.Notify(sigChan, os.Kill)
+
+	sig := <-sigChan
+	log.Println("received", sig)
+
+	log.Println("dropping database...")
+	err = db.DropDb()
 	if err != nil {
-		log.Fatalf("failed to start server: %v", err)
+		log.Println(fmt.Errorf("could not drop database: %v", err).Error())
 	}
+
+	log.Println("server closed")
 }

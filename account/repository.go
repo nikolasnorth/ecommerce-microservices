@@ -9,7 +9,8 @@ import (
 type Account struct {
 	ID        int       `json:"id"`
 	Email     string    `json:"email"`
-	Name      string    `json:"name"`
+	Username  string    `json:"username"`
+	FullName  string    `json:"fullName"`
 	CreatedAt time.Time `json:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt"`
 }
